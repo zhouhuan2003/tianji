@@ -137,7 +137,7 @@ public class InteractionReplyServiceImpl extends ServiceImpl<InteractionReplyMap
         }
         // 3.数据处理，需要查询：提问者信息、回复目标信息、当前用户是否点赞
         Set<Long> userIds = new HashSet<>();
-        List<Long> answerIds = new ArrayList<>();
+        Set<Long> answerIds = new HashSet<>();
         Set<Long> targetReplyIds = new HashSet<>();
         // 3.1.获取提问者id 、回复的目标id、当前回答或评论id（统计点赞信息）
         for (InteractionReply r : records) {
@@ -166,7 +166,7 @@ public class InteractionReplyServiceImpl extends ServiceImpl<InteractionReplyMap
             userMap = users.stream().collect(Collectors.toMap(UserDTO::getId, u -> u));
         }
         // 3.4.查询用户点赞状态
-        Set<Long> bizLiked = remarkClient.getLikeStatusByBizIds(answerIds);
+//        Set<Long> bizLiked = remarkClient.isBizLiked(answerIds);
         // 4.处理VO
         List<ReplyVO> list = new ArrayList<>(records.size());
         for (InteractionReply r : records) {
@@ -190,7 +190,7 @@ public class InteractionReplyServiceImpl extends ServiceImpl<InteractionReplyMap
                 }
             }
             // 4.4.点赞状态
-            v.setLiked(bizLiked.contains(r.getId()));
+//            v.setLiked(bizLiked.contains(r.getId()));
         }
         return new PageDTO<>(page.getTotal(), page.getPages(), list);
     }
