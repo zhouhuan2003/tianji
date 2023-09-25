@@ -4,16 +4,24 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tianji.common.utils.CollUtils;
 import com.tianji.common.utils.DateUtils;
 import com.tianji.common.utils.UserContext;
+import com.tianji.learning.constants.RedisContstants;
+import com.tianji.learning.domain.po.PointsBoard;
 import com.tianji.learning.domain.po.PointsRecord;
+import com.tianji.learning.domain.query.PointsBoardQuery;
+import com.tianji.learning.domain.vo.PointsBoardVO;
 import com.tianji.learning.domain.vo.PointsStatisticsVO;
 import com.tianji.learning.enums.PointsRecordType;
 import com.tianji.learning.mapper.PointsRecordMapper;
 import com.tianji.learning.service.IPointsRecordService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +35,10 @@ import java.util.Map;
  * @since 2023-09-24
  */
 @Service
+@RequiredArgsConstructor
 public class PointsRecordServiceImpl extends ServiceImpl<PointsRecordMapper, PointsRecord> implements IPointsRecordService {
+
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     public void addPointsRecord(Long userId, Integer points, PointsRecordType type) {
@@ -69,6 +80,12 @@ public class PointsRecordServiceImpl extends ServiceImpl<PointsRecordMapper, Poi
         p.setUserId(userId);
         p.setType(type);
         save(p);
+
+        //4 累加并保存总积分值到redis 采用zset结构 记录当前赛季的排行榜
+        LocalDate localDate = LocalDate.now();
+        String format = localDate.format(DateTimeFormatter.ofPattern("yyyyMM"));
+        String key= RedisContstants.POINTS_BOARD_KEY_PREFIX +format;
+        redisTemplate.opsForZSet().incrementScore(key,userId.toString(),realPoints);
     }
 
     @Override
