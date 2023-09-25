@@ -6,6 +6,7 @@ import com.tianji.common.utils.CollUtils;
 import com.tianji.learning.domain.po.PointsBoardSeason;
 import com.tianji.learning.domain.vo.PointsBoardSeasonVO;
 import com.tianji.learning.service.IPointsBoardSeasonService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import java.util.List;
  * @author 周欢
  * @since 2023-09-24
  */
+@Api(tags = "赛季相关接口")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/points/seasons")
@@ -32,7 +34,7 @@ public class PointsBoardSeasonController {
     private final IPointsBoardSeasonService seasonService;
 
     @ApiOperation("查询赛季信息列表")
-    @GetMapping("/seasons/list")
+    @GetMapping("/list")
     public List<PointsBoardSeasonVO> queryPointsBoardSeasons(){
         // 1.获取时间
         LocalDateTime now = LocalDateTime.now();

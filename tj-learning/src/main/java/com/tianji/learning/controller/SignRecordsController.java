@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "签到相关接口")
 @RestController
-@RequestMapping("sing-records")
+@RequestMapping("sign-records")
 @RequiredArgsConstructor
 public class SignRecordsController {
 
@@ -27,8 +27,9 @@ public class SignRecordsController {
         return recordService.addSignRecords();
     }
 
-    @GetMapping
+
     @ApiOperation("查询签到记录")
+    @GetMapping
     public Byte[] querySignRecords(){
         return recordService.querySignRecords();
     }

@@ -2,6 +2,8 @@ package com.tianji.learning.service;
 
 import com.tianji.learning.domain.po.PointsRecord;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.tianji.learning.domain.query.PointsBoardQuery;
+import com.tianji.learning.domain.vo.PointsBoardVO;
 import com.tianji.learning.domain.vo.PointsStatisticsVO;
 import com.tianji.learning.enums.PointsRecordType;
 
