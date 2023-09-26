@@ -97,13 +97,18 @@ public class PointsBoardServiceImpl extends ServiceImpl<PointsBoardMapper, Point
         getBaseMapper().createPointsBoardTable(POINTS_BOARD_TABLE_PREFIX + season);
     }
 
+//    @Override
+//    public List<PointsBoard> queryCurrentBoardList(String key, int pageNo, int pageSize) {
+//        return null;
+//    }
+
     //查询历史赛季列表 db
     private List<PointsBoard> queryHistoryBoard(PointsBoardQuery query) {
         return null;
     }
 
     //查询当前赛季的排行榜列表 查redis
-    private List<PointsBoard> queryCurrentBoard(String key, Integer pageNo, Integer pageSize) {
+    public List<PointsBoard> queryCurrentBoard(String key, Integer pageNo, Integer pageSize) {
         //1.计算start 和 end 分页值
         int start = (pageNo - 1) * pageSize;
         int end =start+pageSize-1;
