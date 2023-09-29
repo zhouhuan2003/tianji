@@ -147,6 +147,15 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon> impleme
         // 4.3.写入数据库
         updateById(c);
 
+        //如果优惠卷是立刻发放，将优惠卷信息（优惠卷id，领劵开始结束时间，发放总数，限领数量）采用hash存入redis
+        if(isBegin){
+            String key=PromotionConstants.COUPON_CACHE_KEY_PREFIX+coupon.getId();//prs:coupon:id
+            redisTemplate.opsForHash().put(key,"issueBeginTime",String.valueOf(DateUtils.toEpochMilli(now)));
+            redisTemplate.opsForHash().put(key,"issueEndTime",String.valueOf(DateUtils.toEpochMilli(dto.getIssueEndTime())));
+            redisTemplate.opsForHash().put(key,"totalNum",String.valueOf(coupon.getTotalNum()));
+            redisTemplate.opsForHash().put(key,"userLimit",String.valueOf(coupon.getUserLimit()));
+        }
+
         // TODO 兑换码生成
         // 5.判断是否需要生成兑换码，优惠券类型必须是兑换码，优惠券状态必须是待发放
         if(coupon.getObtainWay() == ObtainType.ISSUE && coupon.getStatus() == CouponStatus.DRAFT){
@@ -235,7 +244,7 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon> impleme
         }
 
         // 4.删除缓存
-//        redisTemplate.delete(PromotionConstants.COUPON_CACHE_KEY_PREFIX + id);
+        redisTemplate.delete(PromotionConstants.COUPON_CACHE_KEY_PREFIX + id);
     }
 
     @Override
