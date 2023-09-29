@@ -1,5 +1,6 @@
 //package com.tianji.promotion.service.impl;
 //
+//import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 //import com.tianji.common.exceptions.BadRequestException;
 //import com.tianji.common.exceptions.BizIllegalException;
 //import com.tianji.common.utils.UserContext;
@@ -11,14 +12,16 @@
 //import com.tianji.promotion.mapper.UserCouponMapper;
 //import com.tianji.promotion.service.IExchangeCodeService;
 //import com.tianji.promotion.service.IUserCouponService;
-//import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 //import com.tianji.promotion.utils.CodeUtil;
+//import com.tianji.promotion.utils.RedisLock;
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.aop.framework.AopContext;
+//import org.springframework.data.redis.core.StringRedisTemplate;
 //import org.springframework.stereotype.Service;
 //import org.springframework.transaction.annotation.Transactional;
 //
 //import java.time.LocalDateTime;
+//import java.util.concurrent.TimeUnit;
 //
 ///**
 // * <p>
@@ -30,11 +33,13 @@
 // */
 //@Service
 //@RequiredArgsConstructor
-//public class UserCouponServiceImpl extends ServiceImpl<UserCouponMapper, UserCoupon> implements IUserCouponService {
+//public class UserCouponRedisServiceImpl extends ServiceImpl<UserCouponMapper, UserCoupon> implements IUserCouponService {
 //
 //    private final CouponMapper couponMapper;
 //
 //    private final IExchangeCodeService codeService;
+//
+//    private final StringRedisTemplate redisTemplate;
 //
 //    @Override
 ////    @Transactional
@@ -56,12 +61,26 @@
 //        Long userId = UserContext.getUser();
 //        // 4.校验并生成用户券
 ////        checkAndCreateUserCoupon(coupon, userId, null);
-//        synchronized (userId.toString().intern()){
-//            //从aop上下文种获取代理对象
+//
+////        synchronized (userId.toString().intern()){
+////            //从aop上下文种获取代理对象
+////            IUserCouponService userCouponServiceProxy = (IUserCouponService) AopContext.currentProxy();
+//////            checkAndCreateUserCoupon(coupon, userId, null);
+////            userCouponServiceProxy.checkAndCreateUserCoupon(coupon, userId, null);
+////        }
+//        String key="lock:coupon:uid:"+userId;
+//        RedisLock redisLock = new RedisLock(key,redisTemplate);
+//        try {
+//            boolean tryLock = redisLock.tryLock(5, TimeUnit.SECONDS);
+//            if(!tryLock){
+//                throw new BizIllegalException("操作太频繁啦");
+//            }
 //            IUserCouponService userCouponServiceProxy = (IUserCouponService) AopContext.currentProxy();
-////            checkAndCreateUserCoupon(coupon, userId, null);
 //            userCouponServiceProxy.checkAndCreateUserCoupon(coupon, userId, null);
+//        }finally {
+//            redisLock.unlock();
 //        }
+//
 //    }
 //
 //    @Override
